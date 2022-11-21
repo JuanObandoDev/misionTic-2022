@@ -1,4 +1,8 @@
 from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
 
-client = MongoClient("mongodb+srv://grupo2mintic:18nov2022@proyectomintic.rcowoql.mongodb.net/AppWebGestionDocumental") 
+load_dotenv()
+
+client = MongoClient(os.getenv("MONGODB_URI")) 
 db = client.AppWebGestionDocumental
