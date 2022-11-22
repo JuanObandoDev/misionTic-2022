@@ -4,5 +4,5 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = MongoClient(os.getenv("MONGODB_URI")) 
+client = MongoClient(os.getenv("MONGODB_URL"))
 db = client.AppWebGestionDocumental

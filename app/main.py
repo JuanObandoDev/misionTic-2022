@@ -4,8 +4,8 @@ from fastapi.responses import JSONResponse
 from bson import ObjectId
 from typing import List
 from models.docModels.doc import DocumentModel, UpdateDocumentModel, createDocumentModel
-# from models.catModels.categoria import CategoriaModel, UpdateCategoriaModel, createCategoriaModel
-# from models.invModels.inventario import InventarioModel, UpdateInventarioModel, createInventarioModel
+from models.catModels.categoria import CategoriaModel, UpdateCategoriaModel, createCategoriaModel
+from models.invModels.inventario import InventarioModel, UpdateInventarioModel, createInventarioModel
 from components.db.conn import db
 from components.api.api import app
 
@@ -58,3 +58,94 @@ async def delete_document(id: str):
         return {"message": f"Document with id {id} deleted successfully"}
 
     raise HTTPException(status_code=404, detail=f"Document {id} not found")
+
+#Ruta para obtener todas las categorias
+@app.get("/categoria", response_description="All categories here", response_model=List[CategoriaModel])
+async def get_categorias():
+    return list(db["Categoria"].find())
+
+#Ruta para obtener una categoria por su id
+@app.get("/categoria/{id}", response_description="Single category here", response_model=CategoriaModel)
+async def get_categoria_by_id(id: str):
+    if( cat := db["Categoria"].find_one({ "_id": ObjectId(id) })) is not None:
+        return cat
+    raise HTTPException(status_code=404, detail=f"Category with id {id} not found")
+
+#Ruta para crear una categoria
+@app.post("/categoria/new", response_description="New category added", response_model=CategoriaModel)
+async def create_categoria(categoria: createCategoriaModel = Body(...)):
+    db["Categoria"].insert_one(dict(categoria))
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(categoria))
+
+#Ruta para actualizar una categoria
+@app.put("/categoria/{id}", response_description="Category updated", response_model=CategoriaModel)
+async def update_categoria(id: str, cat: UpdateCategoriaModel = Body(...)):
+    cat = {k: v for k, v in cat.dict().items() if v is not None}
+
+    if len(cat) >= 1:
+        update_result = db["Categoria"].update_one({ "_id": ObjectId(id) }, {"$set": cat})
+
+        if update_result.modified_count == 1:
+            if( updated_cat := db["Categoria"].find_one({ "_id": ObjectId(id) }) ) is not None:
+                return updated_cat
+
+    if( existin_cat := db["Categoria"].find_one({ "_id": ObjectId(id) }) ) is not None:
+        return existin_cat
+
+    raise HTTPException(status_code=404, detail=f"Category {id} not found")
+
+#Ruta para eliminar una categoria
+@app.delete("/categoria/{id}", response_description="Category deleted")
+async def delete_categoria(id: str):
+    delete_result = db["Categoria"].delete_one({ "_id": ObjectId(id) })
+
+    if delete_result.deleted_count == 1:
+        return {"message": f"Category with id {id} deleted successfully"}
+
+    raise HTTPException(status_code=404, detail=f"Category {id} not found")
+
+#Ruta para obtener todos los inventarios
+@app.get("/inventario", response_description="All inventories here", response_model=List[InventarioModel])
+async def get_inventarios():
+    return list(db["Inventario"].find())
+
+#Ruta para obtener un inventario por su id
+@app.get("/inventario/{id}", response_description="Single inventory here", response_model=InventarioModel)
+async def get_inventario_by_id(id: str):
+    if( inv := db["Inventario"].find_one({ "_id": ObjectId(id) })) is not None:
+        return inv
+    raise HTTPException(status_code=404, detail=f"Inventory with id {id} not found")
+
+#Ruta para crear un inventario
+@app.post("/inventario/new", response_description="New inventory added", response_model=InventarioModel)
+async def create_inventario(inventario: createInventarioModel = Body(...)):
+    db["Inventario"].insert_one(dict(inventario))
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(inventario))
+
+#Ruta para actualizar un inventario
+@app.put("/inventario/{id}", response_description="Inventory updated", response_model=InventarioModel)
+async def update_inventario(id: str, inv: UpdateInventarioModel = Body(...)):
+    inv = {k: v for k, v in inv.dict().items() if v is not None}
+
+    if len(inv) >= 1:
+        update_result = db["Inventario"].update_one({ "_id": ObjectId(id) }, {"$set": inv})
+
+        if update_result.modified_count == 1:
+            if( updated_inv := db["Inventario"].find_one({ "_id": ObjectId(id) }) ) is not None:
+                return updated_inv
+
+    if( existin_inv := db["Inventario"].find_one({ "_id": ObjectId(id) }) ) is not None:
+        return existin_inv
+
+    raise HTTPException(status_code=404, detail=f"Inventory {id} not found")
+
+#Ruta para eliminar un inventario
+@app.delete("/inventario/{id}", response_description="Inventory deleted")
+async def delete_inventario(id: str):
+    delete_result = db["Inventario"].delete_one({ "_id": ObjectId(id) })
+
+    if delete_result.deleted_count == 1:
+        return {"message": f"Inventory with id {id} deleted successfully"}
+
+    raise HTTPException(status_code=404, detail=f"Inventory {id} not found")
+    
