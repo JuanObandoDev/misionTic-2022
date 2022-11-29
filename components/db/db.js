@@ -61,7 +61,7 @@ const deleteDoc = async (id) => {
 const getAllCategories = async () => {
   try {
     await connect();
-    const categories = await db.collection("Categoria").find().toArray();
+    const categories = await db.collection("Categorias").find().toArray();
     return categories;
   } catch (e) {
     throw new Error("Error getting categories");
@@ -72,7 +72,7 @@ const getCategoryById = async (id) => {
   try {
     await connect();
     const category = await db
-      .collection("Categoria")
+      .collection("Categorias")
       .findOne({ _id: new ObjectId(id) });
     return category;
   } catch (error) {
@@ -83,7 +83,7 @@ const getCategoryById = async (id) => {
 const createCategory = async (category) => {
   try {
     await connect();
-    const result = await db.collection("Categoria").insertOne(category);
+    const result = await db.collection("Categorias").insertOne(category);
     return result;
   } catch (error) {
     throw new Error("Error creating category");
@@ -94,7 +94,7 @@ const updateCategory = async (id, category) => {
   try {
     await connect();
     const result = await db
-      .collection("Categoria")
+      .collection("Categorias")
       .updateOne({ _id: new ObjectId(id) }, { $set: category });
     return result;
   } catch (error) {
@@ -106,7 +106,7 @@ const deleteCategory = async (id) => {
   try {
     await connect();
     const result = await db
-      .collection("Categoria")
+      .collection("Categorias")
       .deleteOne({ _id: new ObjectId(id) });
     return result;
   } catch (error) {
